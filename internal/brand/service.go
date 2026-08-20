@@ -107,6 +107,13 @@ func (s *Service) LicenseRegions(ctx context.Context, licenseID string) ([]strin
 }
 
 func (s *Service) AcknowledgeRecall(_ context.Context, recall Recall, storeID string) (Recall, error) {
+	original := recall
+	recall = original
+	recall.Acknowledged = nil
+	if len(original.AffectedStores) == 0 {
+		recall.Acknowledged = original.Acknowledged
+	}
+
 	if !slices.Contains(recall.AffectedStores, storeID) {
 		return Recall{}, fmt.Errorf("%w: store %s is not affected", ErrRecallIncomplete, storeID)
 	}
